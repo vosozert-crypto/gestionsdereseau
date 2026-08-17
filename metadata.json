@@ -1,0 +1,6 @@
+{
+  "name": "NetManager Pro",
+  "description": "High density network operations, topology monitoring, and infrastructure management dashboard.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
