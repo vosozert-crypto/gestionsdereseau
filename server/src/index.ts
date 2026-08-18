@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import cors from 'cors';
 import helmet from 'helmet';
 import { createServer } from 'http';
+import os from 'os';
 import { Server } from 'socket.io';
 import jwt from 'jsonwebtoken';
 import { config } from './config/index.js';
@@ -13,7 +14,6 @@ import authRoutes from './routes/auth.js';
 import deviceRoutes from './routes/devices.js';
 import logRoutes from './routes/logs.js';
 import dashboardRoutes from './routes/dashboard.js';
-import portRoutes from './routes/ports.js';
 import scanRoutes from './routes/scan.js';
 import diagnosticsRoutes from './routes/diagnostics.js';
 import { authenticateToken, AuthRequest } from './middleware/auth.js';
@@ -61,7 +61,6 @@ app.use('/api/auth', authRoutes);
 app.use('/api/devices', deviceRoutes);
 app.use('/api/logs', logRoutes);
 app.use('/api/dashboard', dashboardRoutes);
-app.use('/api/ports', portRoutes);
 app.use('/api/scan', scanRoutes);
 app.use('/api/diagnostics', diagnosticsRoutes);
 
@@ -113,13 +112,49 @@ io.on('connection', (socket) => {
   });
 });
 
+let lastCpuTimes: os.CpuInfo[] | null = null;
+
+function getCpuUsage(): number {
+  const cpus = os.cpus();
+  if (!cpus || cpus.length === 0) return 0;
+
+  if (lastCpuTimes) {
+    let idleDelta = 0;
+    let totalDelta = 0;
+
+    for (let i = 0; i < cpus.length; i++) {
+      const prev = lastCpuTimes[i];
+      const curr = cpus[i];
+      if (!prev) continue;
+
+      const prevTotal = prev.times.user + prev.times.nice + prev.times.sys + prev.times.idle + prev.times.irq;
+      const currTotal = curr.times.user + curr.times.nice + curr.times.sys + curr.times.idle + curr.times.irq;
+      const diffTotal = Math.max(0, currTotal - prevTotal);
+      const diffIdle = Math.max(0, curr.times.idle - prev.times.idle);
+
+      idleDelta += diffIdle;
+      totalDelta += diffTotal;
+    }
+
+    lastCpuTimes = cpus;
+    if (totalDelta === 0) return 0;
+    return Math.round((1 - idleDelta / totalDelta) * 100);
+  }
+
+  lastCpuTimes = cpus;
+  return 0;
+}
+
 function startMetricsBroadcaster(): void {
   setInterval(() => {
     try {
       const db = getDb();
       const devices = db.prepare(
-        "SELECT id, status, latency_ms FROM devices WHERE status = 'online'"
-      ).all() as { id: string; status: string; latency_ms: number }[];
+        "SELECT status, latency_ms FROM devices WHERE status = 'online'"
+      ).all() as { status: string; latency_ms: number }[];
+
+      const totalMem = os.totalmem();
+      const freeMem = os.freemem();
 
       const metrics = {
         timestamp: new Date().toISOString(),
@@ -128,8 +163,8 @@ function startMetricsBroadcaster(): void {
           ? Math.round((devices.reduce((s, d) => s + d.latency_ms, 0) / devices.length) * 10) / 10
           : 0,
         systemLoad: {
-          cpu: Math.round(10 + Math.random() * 15),
-          memory: Math.round(40 + Math.random() * 20),
+          cpu: getCpuUsage(),
+          memory: totalMem > 0 ? Math.round(((totalMem - freeMem) / totalMem) * 100) : 0,
         },
       };
 

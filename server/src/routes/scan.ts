@@ -3,7 +3,6 @@ import { z } from 'zod';
 import { getDb } from '../db/index.js';
 import { authenticateToken, requireRole, AuthRequest } from '../middleware/auth.js';
 import { scanSubnet, isScanActive, createDiscoveryDevice } from '../services/ipScanner.js';
-import { wmiClient } from '../services/wmiClient.js';
 import { logAudit } from '../middleware/audit.js';
 
 const router = Router();
@@ -97,69 +96,6 @@ router.post('/import-discovered', requireRole('admin', 'operator'), (req: AuthRe
 
   logAudit(req, 'IMPORT_SCAN', 'device', undefined, `Imported ${imported} scanned devices`);
   res.json({ message: `Imported ${imported} devices`, count: imported });
-});
-
-router.post('/wmi-enrich/:deviceId', requireRole('admin', 'operator'), async (req: AuthRequest, res: Response): Promise<void> => {
-  const db = getDb();
-  const deviceId = String(req.params.deviceId);
-  const device = db.prepare('SELECT * FROM devices WHERE id = ?').get(deviceId) as Record<string, unknown> | undefined;
-
-  if (!device) {
-    res.status(404).json({ error: 'Device not found' });
-    return;
-  }
-
-  const agentAvailable = await wmiClient.isAgentAvailable();
-  if (!agentAvailable) {
-    res.status(503).json({ error: 'PcRemoteManager agent not available' });
-    return;
-  }
-
-  const ip = (device.ip as string).replace(/\/\d+$/, '');
-  const enriched = await wmiClient.enrichDeviceInfo(ip);
-
-  if (!enriched) {
-    res.status(502).json({ error: 'WMI query failed for this host' });
-    return;
-  }
-
-  const updates: string[] = [];
-  const values: unknown[] = [];
-
-  if (enriched.hardware.cpuName) {
-    const hw = JSON.parse(device.hardware_json as string || '{}');
-    hw.cpu = enriched.hardware.cpuName;
-    hw.cpuCores = enriched.hardware.cpuCores;
-    hw.ramGB = enriched.hardware.ramTotalGB;
-    hw.gpu = enriched.hardware.gpuName;
-    hw.serialNumber = enriched.hardware.serialNumber || hw.serialNumber;
-    hw.macAddress = enriched.hardware.macAddress || hw.macAddress;
-    updates.push('hardware_json = ?');
-    values.push(JSON.stringify(hw));
-  }
-
-  if (enriched.software.osName) {
-    const sw = JSON.parse(device.software_json as string || '{}');
-    sw.osName = enriched.software.osName;
-    sw.osArchitecture = enriched.software.osArchitecture;
-    sw.kernelVersion = enriched.software.kernelVersion;
-    sw.antivirusStatus = enriched.software.antivirusStatus;
-    sw.firewallEnabled = enriched.software.firewallEnabled;
-    sw.installedApps = enriched.software.installedApps || sw.installedApps;
-    updates.push('software_json = ?');
-    values.push(JSON.stringify(sw));
-  }
-
-  if (updates.length > 0) {
-    updates.push("updated_at = datetime('now')");
-    values.push(req.params.deviceId);
-    db.prepare(`UPDATE devices SET ${updates.join(', ')} WHERE id = ?`).run(...values);
-  }
-
-  logAudit(req, 'WMI_ENRICH', 'device', deviceId, `Enriched via WMI from ${ip}`);
-
-  const updated = db.prepare('SELECT * FROM devices WHERE id = ?').get(deviceId) as Record<string, unknown>;
-  res.json({ message: 'Device enriched via WMI', device: updated });
 });
 
 export default router;

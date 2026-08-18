@@ -30,15 +30,13 @@ interface DeviceDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
   lang: Language;
-  onReboot: (id: string) => void;
 }
 
 export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({
   device,
   isOpen,
   onClose,
-  lang,
-  onReboot
+  lang
 }) => {
   if (!isOpen || !device) return null;
 
@@ -412,13 +410,7 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="bg-[#F8F9FA] px-4 py-2.5 border-t border-[#DEE2E6] flex justify-between items-center shrink-0 font-mono text-xs">
-          <button
-            onClick={() => onReboot(device.id)}
-            className="px-3 py-1 bg-red-100 hover:bg-red-200 text-red-700 font-bold rounded cursor-pointer transition-colors"
-          >
-            Soft Reboot Asset
-          </button>
+        <div className="bg-[#F8F9FA] px-4 py-2.5 border-t border-[#DEE2E6] flex justify-end items-center shrink-0 font-mono text-xs">
           <button
             onClick={onClose}
             className="px-4 py-1 bg-[#212529] hover:bg-black text-white font-bold rounded cursor-pointer transition-colors"

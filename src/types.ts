@@ -86,6 +86,6 @@ export interface SecurityLog {
   protocol: string;
 }
 
-export type NavSection = 'dashboard' | 'inventory' | 'computers' | 'printers' | 'network' | 'servers' | 'topology' | 'security' | 'ports';
+export type NavSection = 'dashboard' | 'inventory' | 'computers' | 'printers' | 'network' | 'servers' | 'topology' | 'security';
 
 export type Language = 'ar' | 'en' | 'fr';

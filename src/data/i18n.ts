@@ -15,9 +15,8 @@ export const translations = {
     printers: 'الطابعات والماسحات',
     network: 'أجهزة الشبكة والـ Firewall',
     servers: 'الخوادم وحدات التخزين',
-    topology: 'خريطة التوبولوجيا',
+topology: 'خريطة التوبولوجيا',
     security: 'سجلات الأمان والـ Syslog',
-    ports: 'منافذ الـ Switch',
     
     // Header
     gateway: 'البوابة الرئيسية',
@@ -27,7 +26,6 @@ export const translations = {
     addNode: 'إضافة جهاز جديد',
     scanNetwork: 'فحص الشبكة الآن',
     scanning: 'جاري الفحص...',
-    pcRemoteAgent: 'عميل PcRemoteManager .NET 8',
     
     // KPI Dashboard Cards
     totalDevices: 'إجمالي أجهزة الشبكة',
@@ -63,10 +61,8 @@ export const translations = {
     // Actions & Auto IP
     btnDetails: 'تفاصيل العتاد والبرامج',
     btnDiagnose: 'تشخيص Ping',
-    btnConfig: 'تعديل البيانات',
-    btnReboot: 'إعادة تشغيل',
+btnConfig: 'تعديل البيانات',
     autoIpBtn: 'توليد IP تلقائي /24',
-    importJsonBtn: 'استيراد JSON من PcRemoteManager',
     
     // Device Detail Modal
     modalTitle: 'بطاقة جرد الجهاز التفصيلية',
@@ -100,30 +96,6 @@ export const translations = {
     appInstallDate: 'تاريخ التثبيت',
     appLicense: 'نوع الترخيص',
     noAppsFound: 'لا توجد تطبيقات إضافية مسجلة.',
-    
-    // PcRemoteManager Modal
-    agentModalTitle: 'تكامل التطبيق المستورد: PcRemoteManager v1.0.0 (.NET 8.0)',
-    agentSubtitle: 'تطبيق إدارة أجهزة الحاسوب وتصدير التقارير باستخدام ClosedXML و System.Management',
-    runtimeFramework: 'بيئة التشغيل (Target Framework)',
-    loadedDependencies: 'المكتبات والمكونات البرمجية المستوردة',
-    importScanJson: 'استيراد نتائج فحص JSON',
-    downloadConfigs: 'تنزيل ملفات التكوين (.deps.json / .runtimeconfig.json)',
-    syncWmiAgent: 'مزامنة عملاء WMI بنشاط',
-    pasteJsonPlaceholder: 'الصق محتوى ملف JSON أو استيراد بيانات PcRemoteManager...',
-    jsonImportSuccess: 'تم استيراد الأصول وتحديث السجل بنجاح من PcRemoteManager!',
-    
-    // Port Management
-    portManagement: 'إدارة المنافذ',
-    portNumber: 'رقم المنفذ',
-    portStatus: 'حالة المنفذ',
-    portSpeed: 'سرعة الاتصال',
-    portVlan: 'VLAN',
-    portPoe: 'طاقة PoE',
-    poeBudget: 'ميزانية الطاقة',
-    togglePortPower: 'تشغيل/إيقاف المنفذ',
-    activePorts: 'المنافذ النشطة',
-    inactivePorts: 'المنافذ غير النشطة',
-    criticalPorts: 'المنافذ المعطلة',
     
     // Scan
     scanTitle: 'ماسح النطاق الفرعي',
@@ -188,7 +160,6 @@ export const translations = {
     servers: 'Servers & Storage',
     topology: 'Topology Map',
     security: 'Security Syslogs',
-    ports: 'Switch Port Matrix',
     
     // Header
     gateway: 'Gateway',
@@ -198,7 +169,6 @@ export const translations = {
     addNode: 'ADD NODE',
     scanNetwork: 'SCAN NETWORK',
     scanning: 'SCANNING...',
-    pcRemoteAgent: 'PcRemoteManager .NET 8 Agent',
     
     // KPI Dashboard Cards
     totalDevices: 'Total Managed Devices',
@@ -235,9 +205,7 @@ export const translations = {
     btnDetails: 'DETAILS',
     btnDiagnose: 'PING',
     btnConfig: 'EDIT',
-    btnReboot: 'REBOOT',
     autoIpBtn: 'AUTO IP /24',
-    importJsonBtn: 'Import PcRemoteManager JSON',
     
     // Device Detail Modal
     modalTitle: 'Device Inventory Card & Specifications',
@@ -271,30 +239,6 @@ export const translations = {
     appInstallDate: 'Install Date',
     appLicense: 'License',
     noAppsFound: 'No extra registered software applications.',
-    
-    // PcRemoteManager Modal
-    agentModalTitle: 'Imported Application Integration: PcRemoteManager v1.0.0 (.NET 8.0)',
-    agentSubtitle: 'Remote PC Management & ClosedXML Excel / System.Management WMI Inventory Engine',
-    runtimeFramework: 'Target Runtime Framework',
-    loadedDependencies: 'Loaded Assemblies & NuGet Dependencies',
-    importScanJson: 'Import JSON Scan Payload',
-    downloadConfigs: 'Download Config Files (.deps.json / .runtimeconfig.json)',
-    syncWmiAgent: 'Sync Active WMI Agents',
-    pasteJsonPlaceholder: 'Paste JSON scan output or import PcRemoteManager file...',
-    jsonImportSuccess: 'Assets imported and inventory synchronized with PcRemoteManager!',
-    
-    // Port Management
-    portManagement: 'PORT MANAGEMENT',
-    portNumber: 'Port #',
-    portStatus: 'Status',
-    portSpeed: 'Link Speed',
-    portVlan: 'VLAN',
-    portPoe: 'PoE Power',
-    poeBudget: 'PoE Budget',
-    togglePortPower: 'Toggle Port Power',
-    activePorts: 'Active Ports',
-    inactivePorts: 'Inactive Ports',
-    criticalPorts: 'Critical Ports',
     
     // Scan
     scanTitle: 'Subnet Scanner',
@@ -359,7 +303,6 @@ export const translations = {
     servers: 'Serveurs & Stockage NAS',
     topology: 'Carte de Topologie',
     security: 'Journaux Sécurité & Syslog',
-    ports: 'Matrice des Ports Switch',
     
     // Header
     gateway: 'Passerelle',
@@ -369,7 +312,6 @@ export const translations = {
     addNode: 'AJOUTER UN PC / NŒUD',
     scanNetwork: 'SCANNER LE RÉSEAU',
     scanning: 'ANALYSE EN COURS...',
-    pcRemoteAgent: 'Agent PcRemoteManager .NET 8',
     
     // KPI Dashboard Cards
     totalDevices: 'Total Équipements Gérés',
@@ -406,9 +348,7 @@ export const translations = {
     btnDetails: 'DÉTAILS',
     btnDiagnose: 'PING',
     btnConfig: 'ÉDITER',
-    btnReboot: 'REDÉMARRER',
     autoIpBtn: 'IP AUTO /24',
-    importJsonBtn: 'Importer JSON PcRemoteManager',
     
     // Device Detail Modal
     modalTitle: 'Fiche d\'Inventaire Détaillée de l\'Équipement',
@@ -442,30 +382,6 @@ export const translations = {
     appInstallDate: 'Date d\'Installation',
     appLicense: 'Licence',
     noAppsFound: 'Aucun logiciel supplémentaire enregistré.',
-    
-    // PcRemoteManager Modal
-    agentModalTitle: 'Intégration de l\'Application Importée : PcRemoteManager v1.0.0 (.NET 8.0)',
-    agentSubtitle: 'Gestion à Distance des PC, Moteur WMI System.Management & Générateur Excel ClosedXML',
-    runtimeFramework: 'Environnement de Sortie (Target Framework)',
-    loadedDependencies: 'Dépendances NuGet & Assemblages Chargés',
-    importScanJson: 'Importer les Données du Scan JSON',
-    downloadConfigs: 'Télécharger les Fichiers de Config (.deps.json / .runtimeconfig.json)',
-    syncWmiAgent: 'Synchroniser les Agents WMI',
-    pasteJsonPlaceholder: 'Coller le contenu du fichier JSON ou importer PcRemoteManager...',
-    jsonImportSuccess: 'Équipements importés et inventaire synchronisé avec PcRemoteManager !',
-    
-    // Port Management
-    portManagement: 'GESTION DES PORTS',
-    portNumber: 'Port #',
-    portStatus: 'Statut',
-    portSpeed: 'Vitesse',
-    portVlan: 'VLAN',
-    portPoe: 'Puissance PoE',
-    poeBudget: 'Budget PoE',
-    togglePortPower: 'Activer/Désactiver le Port',
-    activePorts: 'Ports Actifs',
-    inactivePorts: 'Ports Inactifs',
-    criticalPorts: 'Ports Critiques',
     
     // Scan
     scanTitle: 'Scanner de Sous-Réseau',

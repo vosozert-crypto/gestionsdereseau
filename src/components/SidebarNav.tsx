@@ -6,8 +6,6 @@ import {
   Printer,
   Monitor,
   Router,
-  Radio,
-  Zap,
   Globe,
   HardDrive
 } from 'lucide-react';
@@ -203,19 +201,6 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({
               {criticalCount}
             </span>
           )}
-        </button>
-
-        {/* Ports View */}
-        <button
-          onClick={() => onSelectSection('ports')}
-          className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded text-xs font-medium transition-colors ${
-            activeSection === 'ports'
-              ? 'bg-[#343A40] text-white font-semibold'
-              : 'text-gray-400 hover:text-white hover:bg-[#252834]'
-          }`}
-        >
-          <Zap className="w-3.5 h-3.5 text-amber-400" />
-          {t.ports}
         </button>
       </nav>
 

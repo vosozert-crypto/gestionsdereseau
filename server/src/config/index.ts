@@ -21,17 +21,6 @@ export const config = {
     path: process.env.DB_PATH || './data/netmanager.db',
   },
 
-  snmp: {
-    community: process.env.SNMP_COMMUNITY || 'public',
-    version: parseInt(process.env.SNMP_VERSION || '2', 10) as 1 | 2,
-    pollInterval: parseInt(process.env.SNMP_POLL_INTERVAL || '30000', 10),
-  },
-
-  wmiAgent: {
-    url: process.env.WMI_AGENT_URL || 'http://localhost:5000',
-    timeout: parseInt(process.env.WMI_AGENT_TIMEOUT || '10000', 10),
-  },
-
   scan: {
     subnet: process.env.SCAN_SUBNET || '10.10.0.0',
     mask: parseInt(process.env.SCAN_MASK || '24', 10),

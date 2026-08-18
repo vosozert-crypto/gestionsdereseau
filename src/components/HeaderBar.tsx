@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertTriangle, Plus, RefreshCw, Languages, Terminal } from 'lucide-react';
+import { AlertTriangle, Plus, RefreshCw, Languages } from 'lucide-react';
 import { Language } from '../types';
 import { getTranslation } from '../data/i18n';
 
@@ -12,7 +12,6 @@ interface HeaderBarProps {
   isScanning: boolean;
   onStartScan: () => void;
   onOpenAddModal: () => void;
-  onOpenAgentModal: () => void;
   onToggleAlerts: () => void;
   alertsOpen: boolean;
 }
@@ -26,7 +25,6 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
   isScanning,
   onStartScan,
   onOpenAddModal,
-  onOpenAgentModal,
   onToggleAlerts,
   alertsOpen
 }) => {
@@ -54,16 +52,6 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
       </div>
 
       <div className="flex items-center gap-2 sm:gap-3">
-        {/* PcRemoteManager Agent Integration Button */}
-        <button
-          onClick={onOpenAgentModal}
-          className="px-2.5 py-1 bg-purple-50 hover:bg-purple-100 text-purple-700 text-[11px] font-bold rounded flex items-center gap-1.5 transition-colors cursor-pointer border border-purple-300 font-mono"
-          title="PcRemoteManager .NET 8 Agent Integration & JSON Import"
-        >
-          <Terminal className="w-3.5 h-3.5 text-purple-600" />
-          <span className="hidden md:inline">{t.pcRemoteAgent}</span>
-        </button>
-
         {/* Language Switcher */}
         <button
           onClick={onToggleLang}

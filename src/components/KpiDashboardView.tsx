@@ -17,6 +17,7 @@ import { getTranslation } from '../data/i18n';
 
 interface KpiDashboardViewProps {
   devices: NetworkDevice[];
+  kpi?: Record<string, unknown> | null;
   lang: Language;
   onSelectCategory: (category: 'computer' | 'printer' | 'network' | 'server') => void;
   onOpenDetails: (device: NetworkDevice) => void;
@@ -24,6 +25,7 @@ interface KpiDashboardViewProps {
 
 export const KpiDashboardView: React.FC<KpiDashboardViewProps> = ({
   devices = [],
+  kpi,
   lang,
   onSelectCategory,
   onOpenDetails
@@ -38,20 +40,44 @@ export const KpiDashboardView: React.FC<KpiDashboardViewProps> = ({
 
   const totalRamGB = safeDevices.reduce((acc, d) => acc + (d?.hardware?.ramGB || 0), 0);
   const healthPercent = total > 0 ? Math.round((onlineCount / total) * 100) : 0;
+  const avgLatency = kpi?.avgLatencyMs as number | undefined;
 
-  // OS Distribution calculation
+  // Security stats from backend KPI
+  const security = (kpi?.security as {
+    antivirus?: { status: string; count: number }[];
+    firewallEnabled?: number;
+    firewallTotal?: number;
+    firewallPercent?: number;
+  }) || {};
+  const avActive = security.antivirus?.find((s) => s.status?.toLowerCase().includes('active'))?.count ?? 0;
+  const avTotal = security.antivirus?.reduce((acc, s) => acc + s.count, 0) ?? 0;
+  const avPercent = avTotal > 0 ? Math.round((avActive / avTotal) * 100) : 0;
+  const fwPercent = security.firewallPercent ?? 0;
+
+  // OS Distribution from backend KPI
+  const osDistribution = (kpi?.osDistribution as { name: string; count: number }[]) || [];
   const osCounts: Record<string, number> = {};
-  safeDevices.forEach((d) => {
-    const os = d?.software?.osName || 'Unknown OS';
-    // Group simplified
-    let key = 'Other / Embedded';
-    if (os.includes('Windows')) key = 'Windows OS';
-    else if (os.includes('Ubuntu') || os.includes('Linux')) key = 'Linux Server';
-    else if (os.includes('Cisco') || os.includes('Forti')) key = 'Network Firmware';
-    else if (os.includes('HP') || os.includes('Canon')) key = 'Printer Firmware';
-
-    osCounts[key] = (osCounts[key] || 0) + 1;
-  });
+  if (osDistribution.length > 0) {
+    for (const os of osDistribution) {
+      let key = 'Other / Embedded';
+      const name = os.name || '';
+      if (name.includes('Windows')) key = 'Windows OS';
+      else if (name.includes('Ubuntu') || name.includes('Linux')) key = 'Linux Server';
+      else if (name.includes('Cisco') || name.includes('Forti')) key = 'Network Firmware';
+      else if (name.includes('HP') || name.includes('Canon')) key = 'Printer Firmware';
+      osCounts[key] = (osCounts[key] || 0) + os.count;
+    }
+  } else {
+    safeDevices.forEach((d) => {
+      const os = d?.software?.osName || 'Unknown OS';
+      let key = 'Other / Embedded';
+      if (os.includes('Windows')) key = 'Windows OS';
+      else if (os.includes('Ubuntu') || os.includes('Linux')) key = 'Linux Server';
+      else if (os.includes('Cisco') || os.includes('Forti')) key = 'Network Firmware';
+      else if (os.includes('HP') || os.includes('Canon')) key = 'Printer Firmware';
+      osCounts[key] = (osCounts[key] || 0) + 1;
+    });
+  }
 
   const computersList = safeDevices.filter((d) => d?.category === 'computer');
   const printersList = safeDevices.filter((d) => d?.category === 'printer');
@@ -70,7 +96,7 @@ export const KpiDashboardView: React.FC<KpiDashboardViewProps> = ({
           </div>
           <div className="flex justify-between items-baseline mt-2">
             <span className="text-3xl font-bold font-mono text-gray-900">{total}</span>
-            <span className="text-[10px] text-green-600 font-bold font-mono">100% Tracked</span>
+            <span className="text-[10px] text-green-600 font-bold font-mono">{healthPercent}% Healthy</span>
           </div>
           <div className="w-full bg-gray-100 h-1.5 rounded-xs mt-3 overflow-hidden flex">
             <div
@@ -104,7 +130,7 @@ export const KpiDashboardView: React.FC<KpiDashboardViewProps> = ({
             </span>
           </div>
           <div className="text-[10px] mt-2 text-gray-500 font-mono flex justify-between">
-            <span>Latency Avg: {total > 0 ? (devices.reduce((s: number, d: any) => s + (d.latencyMs || 0), 0) / (onlineCount || 1)).toFixed(1) : '0.0'}ms</span>
+            <span>Latency Avg: {avgLatency ?? (total > 0 ? (devices.reduce((s: number, d: any) => s + (d.latencyMs || 0), 0) / (onlineCount || 1)).toFixed(1) : '0.0')}ms</span>
             <span className={`${healthPercent >= 90 ? 'text-green-600' : healthPercent >= 70 ? 'text-amber-600' : 'text-red-600'} font-bold`}>Health {healthPercent}%</span>
           </div>
         </div>
@@ -137,8 +163,8 @@ export const KpiDashboardView: React.FC<KpiDashboardViewProps> = ({
             <span className="text-[10px] text-purple-600 font-bold">RAM Inventory</span>
           </div>
           <div className="text-[10px] mt-2 text-gray-500 font-mono flex justify-between">
-            <span>Avg Storage: 58%</span>
-            <span className="font-bold text-gray-700">DDR4/DDR5 ECC</span>
+            <span>Avg Disk Usage: {safeDevices.length > 0 ? Math.round(safeDevices.reduce((acc, d) => acc + (d?.hardware?.diskUsagePercent || 0), 0) / safeDevices.length) + '%' : '—'}</span>
+            <span className="font-bold text-gray-700">{safeDevices.length > 0 ? `${(totalRamGB / (onlineCount || 1)).toFixed(0)}GB avg/device` : 'No data'}</span>
           </div>
         </div>
       </div>
@@ -341,15 +367,15 @@ export const KpiDashboardView: React.FC<KpiDashboardViewProps> = ({
             <div className="space-y-2 text-[11px] font-mono">
               <div className="flex justify-between p-2 bg-gray-50 rounded border border-gray-200">
                 <span className="text-gray-600">Antivirus Active:</span>
-                <span className="text-green-600 font-bold">90% Compliant</span>
+                <span className={`${avPercent >= 90 ? 'text-green-600' : avPercent >= 70 ? 'text-amber-600' : 'text-red-600'} font-bold`}>{avPercent}% Compliant</span>
               </div>
               <div className="flex justify-between p-2 bg-gray-50 rounded border border-gray-200">
                 <span className="text-gray-600">Local Firewall Enabled:</span>
-                <span className="text-green-600 font-bold">100% Active</span>
+                <span className={`${fwPercent >= 90 ? 'text-green-600' : fwPercent >= 70 ? 'text-amber-600' : 'text-red-600'} font-bold`}>{fwPercent}% Active</span>
               </div>
               <div className="flex justify-between p-2 bg-gray-50 rounded border border-gray-200">
-                <span className="text-gray-600">Latest OS Patches:</span>
-                <span className="text-blue-600 font-bold">Aug 2026 Rollout</span>
+                <span className="text-gray-600">Devices Tracked:</span>
+                <span className="text-blue-600 font-bold">{safeDevices.length}</span>
               </div>
             </div>
           </div>

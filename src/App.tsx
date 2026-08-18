@@ -10,12 +10,12 @@ import { SidebarNav } from './components/SidebarNav.tsx';
 import { HeaderBar } from './components/HeaderBar.tsx';
 import { NavSection, Language } from './types.ts';
 import { AlertTriangle } from 'lucide-react';
+import { api } from './services/api.ts';
 
 const KpiDashboardView = lazy(() => import('./components/KpiDashboardView.tsx').then(m => ({ default: m.KpiDashboardView })));
 const InventoryTableView = lazy(() => import('./components/InventoryTableView.tsx').then(m => ({ default: m.InventoryTableView })));
 const TopologyView = lazy(() => import('./components/TopologyView.tsx').then(m => ({ default: m.TopologyView })));
 const SecurityLogsView = lazy(() => import('./components/SecurityLogsView.tsx').then(m => ({ default: m.SecurityLogsView })));
-const PortManagementView = lazy(() => import('./components/PortManagementView.tsx').then(m => ({ default: m.PortManagementView })));
 const DeviceDetailModal = lazy(() => import('./components/DeviceDetailModal.tsx').then(m => ({ default: m.DeviceDetailModal })));
 const AddDeviceModal = lazy(() => import('./components/AddDeviceModal.tsx').then(m => ({ default: m.AddDeviceModal })));
 const EditDeviceModal = lazy(() => import('./components/EditDeviceModal.tsx').then(m => ({ default: m.EditDeviceModal })));
@@ -43,7 +43,7 @@ function MainApp() {
   const [ipScanModalOpen, setIpScanModalOpen] = useState(false);
   const [alertsOpen, setAlertsOpen] = useState(false);
 
-  const { devices, logs, kpi, isLoading, fetchDevices, fetchLogs, fetchKpi, addDevice, updateDevice, deleteDevice, rebootDevice, clearDevices } = useDevices();
+  const { devices, logs, kpi, isLoading, fetchDevices, fetchLogs, fetchKpi, addDevice, updateDevice, deleteDevice, clearDevices } = useDevices();
   const { isConnected, liveMetrics, connect, subscribeToMetrics } = useWebSocket();
   const { logout } = useAuth();
 
@@ -84,10 +84,8 @@ function MainApp() {
     onAddDevice: () => setAddModalOpen(true),
     onClearDevices: clearDevices,
     onResetDevices: fetchDevices,
-    onRebootDevice: rebootDevice,
     onStartScan: () => setIpScanModalOpen(true),
     isScanning: false,
-    onOpenAgentModal: () => {},
   };
 
   return (
@@ -112,7 +110,6 @@ function MainApp() {
           isScanning={false}
           onStartScan={() => setIpScanModalOpen(true)}
           onOpenAddModal={() => setAddModalOpen(true)}
-          onOpenAgentModal={() => {}}
           onToggleAlerts={() => setAlertsOpen(p => !p)}
           alertsOpen={alertsOpen}
         />
@@ -169,6 +166,7 @@ function MainApp() {
             {activeSection === 'dashboard' && (
               <KpiDashboardView
                 devices={devices}
+                kpi={kpi}
                 lang={lang}
                 onSelectCategory={(cat) => {
                   if (cat === 'computer') setActiveSection('computers');
@@ -186,7 +184,6 @@ function MainApp() {
             {activeSection === 'servers' && <InventoryTableView {...inventoryProps} categoryFilter="server" />}
             {activeSection === 'topology' && <TopologyView devices={devices} lang={lang} onOpenDetails={handleOpenDetails} />}
             {activeSection === 'security' && <SecurityLogsView logs={logs} lang={lang} />}
-            {activeSection === 'ports' && <PortManagementView lang={lang} />}
           </Suspense>
         </div>
       </main>
@@ -198,7 +195,6 @@ function MainApp() {
             isOpen={detailModalOpen}
             onClose={() => setDetailModalOpen(false)}
             lang={lang}
-            onReboot={rebootDevice}
           />
         )}
         {addModalOpen && (
@@ -226,7 +222,6 @@ function MainApp() {
             onClose={() => setIpScanModalOpen(false)}
             existingDevices={devices}
             onImportDiscoveredDevices={async (items) => {
-              const { api } = await import('./services/api.ts');
               await api.importDevices(items as unknown as Record<string, unknown>[]);
               await fetchDevices();
             }}

@@ -138,10 +138,6 @@ class ApiClient {
     return this.request<any>(`/api/devices/${id}`, { method: 'DELETE' });
   }
 
-  async rebootDevice(id: string) {
-    return this.request<any>(`/api/devices/${id}/reboot`, { method: 'POST' });
-  }
-
   async importDevices(devices: Record<string, unknown>[]) {
     return this.request<any>('/api/devices/import', { method: 'POST', body: { devices } });
   }
@@ -165,15 +161,6 @@ class ApiClient {
     return this.request<any>('/api/logs/stats');
   }
 
-  // Ports
-  async getPorts() {
-    return this.request<{ ports: any[]; stats: any }>('/api/ports');
-  }
-
-  async getPort(number: number) {
-    return this.request<any>(`/api/ports/${number}`);
-  }
-
   // Scan
   async startScan(subnet?: string, startIp?: number, endIp?: number) {
     return this.request<any>('/api/scan', {
@@ -188,10 +175,6 @@ class ApiClient {
 
   async importScannedDevices(devices: Record<string, unknown>[]) {
     return this.request<any>('/api/scan/import-discovered', { method: 'POST', body: { devices } });
-  }
-
-  async enrichDeviceWmi(deviceId: string) {
-    return this.request<any>(`/api/scan/wmi-enrich/${deviceId}`, { method: 'POST' });
   }
 
   // Diagnostics

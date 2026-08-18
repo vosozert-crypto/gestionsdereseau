@@ -5,7 +5,6 @@ import {
   Layers,
   FileSpreadsheet,
   Download,
-  Upload,
   Edit3,
   Trash2,
   RotateCcw,
@@ -29,10 +28,8 @@ interface InventoryTableViewProps {
   onAddDevice?: () => void;
   onClearDevices?: () => void;
   onResetDevices?: () => void;
-  onRebootDevice: (id: string) => void;
   onStartScan: () => void;
   isScanning: boolean;
-  onOpenAgentModal?: () => void;
 }
 
 export const InventoryTableView: React.FC<InventoryTableViewProps> = ({
@@ -47,10 +44,8 @@ export const InventoryTableView: React.FC<InventoryTableViewProps> = ({
   onAddDevice,
   onClearDevices,
   onResetDevices,
-  onRebootDevice,
   onStartScan,
-  isScanning,
-  onOpenAgentModal
+  isScanning
 }) => {
   const t = getTranslation(lang);
 
@@ -325,17 +320,6 @@ export const InventoryTableView: React.FC<InventoryTableViewProps> = ({
             <RefreshCw className="w-3 h-3 text-blue-400" />
             <span className="hidden sm:inline">Scan IP</span>
           </button>
-
-          {onOpenAgentModal && (
-            <button
-              onClick={onOpenAgentModal}
-              className="text-[10px] px-2 py-1 bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-300 font-bold rounded flex items-center gap-1 cursor-pointer transition-colors font-mono"
-              title="Import JSON depuis PcRemoteManager Agent"
-            >
-              <Upload className="w-3 h-3 text-purple-600" />
-              <span className="hidden lg:inline">JSON</span>
-            </button>
-          )}
 
           {onResetDevices && (
             <button

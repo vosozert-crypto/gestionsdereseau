@@ -123,8 +123,6 @@ interface DeviceContextType extends DeviceState {
   addDevice: (data: Record<string, unknown>) => Promise<void>;
   updateDevice: (id: string, data: Record<string, unknown>) => Promise<void>;
   deleteDevice: (id: string) => Promise<void>;
-  rebootDevice: (id: string) => Promise<void>;
-  importDevices: (devices: Record<string, unknown>[]) => Promise<void>;
   clearDevices: () => Promise<void>;
   fetchLogs: (params?: Record<string, string>) => Promise<void>;
   fetchKpi: () => Promise<void>;
@@ -176,16 +174,6 @@ export function DeviceProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: 'REMOVE_DEVICE', payload: id });
   }, []);
 
-  const rebootDevice = useCallback(async (id: string) => {
-    const device = await api.rebootDevice(id);
-    dispatch({ type: 'UPDATE_DEVICE', payload: device });
-  }, []);
-
-  const importDevices = useCallback(async (devices: Record<string, unknown>[]) => {
-    await api.importDevices(devices);
-    await fetchDevices();
-  }, [fetchDevices]);
-
   const clearDevices = useCallback(async () => {
     await api.clearDevices();
     dispatch({ type: 'CLEAR_DEVICES' });
@@ -223,8 +211,6 @@ export function DeviceProvider({ children }: { children: React.ReactNode }) {
       addDevice,
       updateDevice,
       deleteDevice,
-      rebootDevice,
-      importDevices,
       clearDevices,
       fetchLogs,
       fetchKpi,

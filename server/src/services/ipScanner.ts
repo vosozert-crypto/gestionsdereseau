@@ -1,8 +1,6 @@
 import { exec, execSync } from 'child_process';
 import { Socket } from 'net';
 import { getDb } from '../db/index.js';
-import { config } from '../config/index.js';
-import { wmiClient } from './wmiClient.js';
 import { Server as SocketServer } from 'socket.io';
 
 export interface ScanResult {

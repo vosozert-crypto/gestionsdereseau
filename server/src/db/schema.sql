@@ -79,19 +79,3 @@ CREATE TABLE IF NOT EXISTS audit_logs (
 CREATE INDEX IF NOT EXISTS idx_audit_user ON audit_logs(user_id);
 CREATE INDEX IF NOT EXISTS idx_audit_action ON audit_logs(action);
 CREATE INDEX IF NOT EXISTS idx_audit_created_at ON audit_logs(created_at);
-
-CREATE TABLE IF NOT EXISTS device_metrics (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  device_id TEXT NOT NULL,
-  cpu_usage REAL,
-  mem_usage REAL,
-  disk_usage REAL,
-  latency_ms REAL,
-  tx_rate_bytes INTEGER,
-  rx_rate_bytes INTEGER,
-  recorded_at TEXT NOT NULL DEFAULT (datetime('now')),
-  FOREIGN KEY (device_id) REFERENCES devices(id) ON DELETE CASCADE
-);
-
-CREATE INDEX IF NOT EXISTS idx_metrics_device ON device_metrics(device_id);
-CREATE INDEX IF NOT EXISTS idx_metrics_recorded ON device_metrics(recorded_at);

@@ -193,24 +193,6 @@ router.delete('/:id', requireRole('admin'), (req: AuthRequest, res: Response): v
   res.json({ message: 'Device deleted', id: deviceId });
 });
 
-router.post('/:id/reboot', requireRole('admin', 'operator'), (req: AuthRequest, res: Response): void => {
-  const db = getDb();
-  const deviceId = getParamId(req);
-  const existing = db.prepare('SELECT id, name FROM devices WHERE id = ?').get(deviceId) as { id: string; name: string } | undefined;
-
-  if (!existing) {
-    res.status(404).json({ error: 'Device not found' });
-    return;
-  }
-
-  db.prepare("UPDATE devices SET uptime = '00h 00m', status = 'online', updated_at = datetime('now') WHERE id = ?").run(deviceId);
-
-  logAudit(req, 'REBOOT', 'device', deviceId, `Rebooted device ${existing.name}`);
-
-  const row = db.prepare('SELECT * FROM devices WHERE id = ?').get(deviceId) as Record<string, unknown>;
-  res.json(mapDeviceRow(row));
-});
-
 router.post('/import', requireRole('admin', 'operator'), (req: AuthRequest, res: Response): void => {
   const { devices: importDevices } = req.body;
 
