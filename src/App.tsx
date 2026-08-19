@@ -47,10 +47,25 @@ function MainApp() {
   const { isConnected, liveMetrics, connect, subscribeToMetrics } = useWebSocket();
   const { logout } = useAuth();
 
+  const [systemInfo, setSystemInfo] = useState<{ gateway: string; uptime: string }>({ gateway: '--', uptime: '--' });
+
   useEffect(() => {
     connect();
     subscribeToMetrics();
   }, [connect, subscribeToMetrics]);
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchLocalIp = async () => {
+      try {
+        const info = await api.getLocalIp();
+        if (mounted) setSystemInfo({ gateway: info.localIp, uptime: info.subnet });
+      } catch { /* keep defaults */ }
+    };
+    fetchLocalIp();
+    const interval = setInterval(fetchLocalIp, 30000);
+    return () => { mounted = false; clearInterval(interval); };
+  }, []);
 
   const handleToggleLang = () => {
     setLang((prev) => (prev === 'ar' ? 'en' : prev === 'en' ? 'fr' : 'ar'));
@@ -112,6 +127,8 @@ function MainApp() {
           onOpenAddModal={() => setAddModalOpen(true)}
           onToggleAlerts={() => setAlertsOpen(p => !p)}
           alertsOpen={alertsOpen}
+          gateway={systemInfo.gateway}
+          uptime={systemInfo.uptime}
         />
 
         <div className="bg-[#0D1017] text-gray-500 px-4 py-1.5 border-b border-[#1A1F2E] flex flex-wrap items-center justify-between text-[10px] font-mono shrink-0">

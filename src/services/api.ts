@@ -104,7 +104,10 @@ class ApiClient {
 
   async logout() {
     try {
-      await this.request('/api/auth/logout', { method: 'POST', body: { refreshToken: localStorage.getItem('refreshToken') } });
+      await this.request('/api/auth/logout', {
+        method: 'POST',
+        body: { refreshToken: localStorage.getItem('refreshToken') },
+      });
     } finally {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
@@ -161,28 +164,93 @@ class ApiClient {
     return this.request<any>('/api/logs/stats');
   }
 
-  // Scan
-  async startScan(subnet?: string, startIp?: number, endIp?: number) {
-    return this.request<any>('/api/scan', {
+  // Network - Local IP
+  async getLocalIp() {
+    return this.request<{
+      localIp: string;
+      subnet: string;
+      netmask: string;
+      interfaceName: string;
+      mac: string;
+      allInterfaces: Array<{ name: string; address: string; netmask: string; family: string; mac: string }>;
+    }>('/api/network/local-ip');
+  }
+
+  // Network - Scan
+  async startNetworkScan(subnet?: string, startIp?: number, endIp?: number) {
+    return this.request<{
+      subnet: string;
+      totalScanned: number;
+      hostsFound: number;
+      results: Array<{
+        ip: string;
+        mac: string;
+        hostname: string;
+        reachable: boolean;
+        latencyMs: number;
+        vendor: string;
+      }>;
+    }>('/api/network/scan', {
       method: 'POST',
       body: { subnet, startIp, endIp },
     });
   }
 
-  async getScanStatus() {
-    return this.request<{ active: boolean }>('/api/scan/status');
+  async getNetworkScanStatus() {
+    return this.request<{ active: boolean }>('/api/network/scan/status');
   }
 
-  async importScannedDevices(devices: Record<string, unknown>[]) {
-    return this.request<any>('/api/scan/import-discovered', { method: 'POST', body: { devices } });
+  // USB Printers
+  async getUsbPrinters() {
+    return this.request<{
+      count: number;
+      usbPrinters: Array<{ name: string; port: string; driver: string; isUSB: boolean; status: string }>;
+      allPrinters: Array<{ name: string; port: string; driver: string; isUSB: boolean; status: string }>;
+    }>('/api/usb/printers');
   }
 
   // Diagnostics
   async pingDevice(ip: string) {
-    return this.request<{ output: string[]; reachable: boolean; latencyMs: number }>(`/api/diagnostics/ping`, {
+    return this.request<{
+      output: string[];
+      reachable: boolean;
+      latencyMs: number;
+      targetIp: string;
+      packetsSent: number;
+      packetsReceived: number;
+      packetLoss: string;
+    }>('/api/diagnostics/ping', {
       method: 'POST',
       body: { ip },
     });
+  }
+
+  // Legacy scan methods (for backward compatibility)
+  async startScan(subnet?: string, startIp?: number, endIp?: number) {
+    return this.startNetworkScan(subnet, startIp, endIp);
+  }
+
+  async getScanStatus() {
+    return this.getNetworkScanStatus();
+  }
+
+  async importScannedDevices(devices: Record<string, unknown>[]) {
+    return this.request<any>('/api/devices/import', { method: 'POST', body: { devices } });
+  }
+
+  // System Info
+  async getSystemInfo() {
+    return this.request<{
+      gateway: string;
+      uptime: string;
+      hostname: string;
+      platform: string;
+      arch: string;
+      cpuCount: number;
+      cpuModel: string;
+      loadAverage: { '1m': number; '5m': number; '15m': number };
+      memory: { totalGB: number; freeGB: number; usedPercent: number };
+    }>('/api/system');
   }
 }
 

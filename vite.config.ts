@@ -11,27 +11,24 @@ export default defineConfig({
     },
   },
   server: {
-    port: 3000,
+    port: 5173,
     host: '0.0.0.0',
     proxy: {
       '/api': {
         target: 'http://localhost:4000',
         changeOrigin: true,
       },
-      '/socket.io': {
-        target: 'http://localhost:4000',
-        ws: true,
-      },
     },
   },
   build: {
     target: 'es2022',
     minify: 'esbuild',
+    outDir: 'dist',
     rollupOptions: {
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom', 'react-router-dom'],
-          ui: ['lucide-react', 'react-hot-toast'],
+          ui: ['lucide-react', 'react-hot-toast', 'xlsx'],
         },
       },
     },

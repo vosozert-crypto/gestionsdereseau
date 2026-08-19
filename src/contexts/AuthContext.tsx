@@ -33,7 +33,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(parsed);
 
         api.getMe().then((me) => {
-          setUser(me);
+          setUser({ ...me, role: me.role as User['role'] });
         }).catch(() => {
           localStorage.removeItem('user');
           localStorage.removeItem('accessToken');
@@ -51,7 +51,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = useCallback(async (username: string, password: string) => {
     const data = await api.login(username, password);
-    setUser(data.user);
+    setUser({ ...data.user, role: data.user.role as User['role'] });
   }, []);
 
   const logout = useCallback(async () => {
